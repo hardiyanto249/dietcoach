@@ -9,6 +9,8 @@ export const oauth2Client = new google.auth.OAuth2(
 export const SCOPES = [
     "https://www.googleapis.com/auth/calendar",
     "https://www.googleapis.com/auth/calendar.events",
+    "https://www.googleapis.com/auth/userinfo.profile",
+    "https://www.googleapis.com/auth/userinfo.email",
 ];
 
 export function getAuthUrl() {
@@ -26,4 +28,11 @@ export async function getTokens(code: string) {
 
 export function setCredentials(tokens: any) {
     oauth2Client.setCredentials(tokens);
+}
+
+export async function getUserProfile(accessToken: string) {
+    oauth2Client.setCredentials({ access_token: accessToken });
+    const oauth2 = google.oauth2({ version: 'v2', auth: oauth2Client });
+    const { data } = await oauth2.userinfo.get();
+    return data;
 }

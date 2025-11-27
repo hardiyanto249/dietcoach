@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 import { Heart, MessageCircle, Image as ImageIcon, ArrowLeft, Share2, X, Edit2, Trash2 } from "lucide-react";
 import { getGravatarUrl } from "@/lib/gravatar";
 
-interface Post { id: string; user: { id: string; name: string; email: string }; content: string; imageUrl?: string; likesCount: number; commentsCount: number; isLiked: boolean; createdAt: string; }
-interface UserProfile { id: string; name: string; email: string; }
-interface Comment { id: string; postId: string; userId: string; userName: string; userEmail: string; content: string; createdAt: string; }
+interface Post { id: string; user: { id: string; name: string; email: string; image?: string }; content: string; imageUrl?: string; likesCount: number; commentsCount: number; isLiked: boolean; createdAt: string; }
+interface UserProfile { id: string; name: string; email: string; image?: string; }
+interface Comment { id: string; postId: string; userId: string; userName: string; userEmail: string; userImage?: string; content: string; createdAt: string; }
 
 export default function SocialPageV2() {
     const router = useRouter();
@@ -48,10 +48,10 @@ export default function SocialPageV2() {
                 const data = await res.json();
                 setUserProfile(data);
             } else {
-                setUserProfile({ id: "", name: "User", email: "" });
+                setUserProfile({ id: "", name: "User", email: "", image: "" });
             }
         } catch (error) {
-            setUserProfile({ id: "", name: "User", email: "" });
+            setUserProfile({ id: "", name: "User", email: "", image: "" });
         }
     };
 
@@ -301,7 +301,7 @@ export default function SocialPageV2() {
                                 style={{ width: '48px', height: '48px', minWidth: '48px' }}
                             >
                                 <img
-                                    src={getGravatarUrl(userProfile.email, 48)}
+                                    src={userProfile.image || getGravatarUrl(userProfile.email, 48)}
                                     alt={userProfile.name}
                                     className="w-full h-full object-cover"
                                 />
@@ -367,7 +367,7 @@ export default function SocialPageV2() {
                                             style={{ width: '48px', height: '48px', minWidth: '48px' }}
                                         >
                                             <img
-                                                src={getGravatarUrl(post.user.email, 48)}
+                                                src={post.user.image || getGravatarUrl(post.user.email, 48)}
                                                 alt={post.user.name}
                                                 className="w-full h-full object-cover"
                                             />
@@ -432,7 +432,7 @@ export default function SocialPageV2() {
                                                                         style={{ width: '48px', height: '48px', minWidth: '48px' }}
                                                                     >
                                                                         <img
-                                                                            src={getGravatarUrl(c.userEmail, 48)}
+                                                                            src={c.userImage || getGravatarUrl(c.userEmail, 48)}
                                                                             alt={c.userName}
                                                                             className="w-full h-full object-cover"
                                                                         />

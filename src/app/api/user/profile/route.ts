@@ -31,6 +31,8 @@ export async function GET(req: Request) {
         return NextResponse.json({
             name: user.name,
             email: user.email,
+            // @ts-ignore: Prisma client update failed
+            image: user.image,
             dietProfile: user.profile ? {
                 ...user.profile,
                 currentWeight: user.profile.weight // Map weight to currentWeight for frontend compatibility

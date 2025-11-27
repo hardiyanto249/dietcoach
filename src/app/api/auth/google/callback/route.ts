@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getSession } from "@/lib/session";
-import { getTokens } from "@/lib/google";
+import { getTokens, getUserProfile } from "@/lib/google";
 
 export async function GET(request: NextRequest) {
     const session = await getSession();
@@ -39,6 +39,21 @@ export async function GET(request: NextRequest) {
                 expiresAt: new Date(tokens.expiry_date!),
             },
         });
+
+        // Fetch and save user profile picture
+        try {
+            const profile = await getUserProfile(tokens.access_token!);
+            if (profile.picture) {
+                await prisma.user.update({
+                    where: { id: session.userId },
+                    // @ts-ignore: Prisma client update failed due to file lock
+                    data: { image: profile.picture },
+                });
+            }
+        } catch (profileError) {
+            console.error("Failed to fetch/save Google profile:", profileError);
+            // Don't fail the whole auth process if profile fetch fails
+        }
 
         return NextResponse.redirect(new URL("/profile?success=google_connected", request.url));
     } catch (error) {

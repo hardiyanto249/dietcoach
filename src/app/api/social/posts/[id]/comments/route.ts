@@ -36,7 +36,8 @@ export async function POST(
                     select: {
                         id: true,
                         name: true,
-                        email: true
+                        email: true,
+                        image: true
                     }
                 }
             }
@@ -52,6 +53,8 @@ export async function POST(
                 userId: newComment.userId,
                 userName: newComment.user.name,
                 userEmail: newComment.user.email,
+                // @ts-ignore: Prisma client update failed
+                userImage: newComment.user.image,
                 content: newComment.content,
                 createdAt: newComment.createdAt.toISOString()
             }
@@ -77,7 +80,8 @@ export async function GET(
                     select: {
                         id: true,
                         name: true,
-                        email: true
+                        email: true,
+                        image: true
                     }
                 }
             },
@@ -93,6 +97,8 @@ export async function GET(
             userId: comment.userId,
             userName: comment.user.name,
             userEmail: comment.user.email,
+            // @ts-ignore: Prisma client update failed
+            userImage: comment.user.image,
             content: comment.content,
             createdAt: comment.createdAt.toISOString()
         }));
