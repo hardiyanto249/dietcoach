@@ -1,0 +1,67 @@
+import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
+import { getSession } from "@/lib/session";
+
+export async function GET(request: NextRequest) {
+    const session = await getSession();
+    if (!session) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    try {
+        const { searchParams } = new URL(request.url);
+        const days = parseInt(searchParams.get("days") || "7");
+
+        // Calculate date range
+        const endDate = new Date();
+        endDate.setHours(23, 59, 59, 999);
+
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - (days - 1));
+        startDate.setHours(0, 0, 0, 0);
+
+        // Fetch water intake logs for the date range
+        const logs = await prisma.waterIntake.findMany({
+            where: {
+                userId: session.userId,
+                loggedAt: {
+                    gte: startDate,
+                    lte: endDate,
+                },
+            },
+            orderBy: {
+                loggedAt: 'asc',
+            },
+        });
+
+        // Group by date and sum glasses
+        const dailyStats: { [key: string]: number } = {};
+
+        // Initialize all dates with 0
+        for (let i = 0; i < days; i++) {
+            const date = new Date();
+            date.setDate(date.getDate() - i);
+            const dateKey = date.toISOString().split('T')[0];
+            dailyStats[dateKey] = 0;
+        }
+
+        // Sum glasses per day
+        logs.forEach(log => {
+            const dateKey = new Date(log.loggedAt).toISOString().split('T')[0];
+            dailyStats[dateKey] = (dailyStats[dateKey] || 0) + log.glasses;
+        });
+
+        // Convert to array format
+        const result = Object.entries(dailyStats)
+            .map(([date, glasses]) => ({
+                date,
+                glasses,
+            }))
+            .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+        return NextResponse.json(result);
+    } catch (error) {
+        console.error("Water intake stats error:", error);
+        return NextResponse.json({ error: "Failed to fetch water intake stats" }, { status: 500 });
+    }
+}

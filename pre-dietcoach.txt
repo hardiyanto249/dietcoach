@@ -1,0 +1,113 @@
+
+
+Usulan:
+aplikasi bisa kasih saran, saat jatah Kkal tiggal sedikit. Seperti misalnya saran makanan yang cocok..
+atau olah raga yang cocok agar angka cal bisa naik dan user bisa makan "enak". Atau apa yg harus dilakukan kala cal mencapai dibawah 0. Olahraga hari itu seperti apa untuk menutupnya. Tentunya dilihat dari historikal User seperti berat badan, dll..
+
+
+
+"DIET COACH"
+
+1. Konsep Inti & Value Proposition
+
+Chatbot AI sebagai “Personal Health Coach 24/7”
+Membantu user mencapai berat badan ideal + gaya hidup sehat secara berkelanjutan
+Menggabungkan tracking makanan, olahraga, tidur, reminder via Google Calendar, dan prediksi berat badan masa depan
+Mampu berkomunikasi dengan tulisan maupun audio
+
+2. Fitur Utama (MVP + Future)
+Fitur Inti (MVP – Minimum Viable Product)
+
+Onboarding User
+Input: umur, jenis kelamin, tinggi badan, berat badan saat ini, target berat badan, level aktivitas harian, alergi/intoleransi makanan, preferensi diet (opsional: keto, vegan, mediterania, dll)
+Hitung BMR + TDEE otomatis + target kalori harian
+
+Chatbot Interaktif (seperti WhatsApp/Telegram style)
+User bisa ketik bebas: “Aku tadi sarapan nasi goreng + telor” → bot langsung hitung kalori & makro
+Bot bisa bertanya balik jika kurang jelas (“Berapa porsi nasi gorengnya? Pakai minyak berapa sendok?”)
+Bot memberikan feedback real-time: “Kalori sarapanmu 650 kcal, masih ada sisa 1150 kcal hari ini”
+
+Food Logging & Kalori Recognition
+3 cara input makanan:
+a. Ketik teks biasa (NLP + database makanan Indonesia + Nutrix API / Nutritionix / FatSecret)
+b. Foto makanan → AI image recognition (Google Vision / Clarifai / custom model) → estimasi kalori
+c. Scan barcode (khusus makanan kemasan)
+
+Integrasi Google Calendar
+Bot bisa buat event otomatis:
+“Besok jam 6 pagi aku ingetin olahraga ya”
+“Setiap hari jam 22.00 reminder minum air & tidur”
+Meal reminder, fasting reminder (jika user ikut IF 16:8 dll)
+
+
+Tracking Harian
+Kalori masuk vs kalori keluar
+Makronutrien (protein, karbo, lemak)
+Air minum (bisa diingetin tiap 2 jam)
+Tidur (manual input atau integrasi Google Fit/Apple Health)
+Olahraga (manual atau sync Google Fit/Apple Health/Strava)
+
+Prediksi Berat Badan Masa Depan
+Menggunakan rumus: 1 kg lemak ≈ 7700 kcal deficit/surplus
+Grafik prediksi 1–6 bulan ke depan berdasarkan deficit/surplus rata-rata 7–14 hari terakhir
+Peringatan jika penurunan terlalu cepat (>1 kg/minggu) → risiko yo-yo effect
+
+Personal Weekly Report
+Setiap Senin pagi bot kirim ringkasan mingguan + saran perbaikan
+
+
+Fitur Lanjutan (Post-MVP)
+
+Resep sehat otomatis berdasarkan sisa kalori hari itu
+Mood & energi tracking (pengaruh terhadap binge eating)
+Integrasi smartwatch (heart rate, steps otomatis)
+Komunitas / challenge bareng teman
+Mode “coach keras” vs “coach penyemangat” (pilih personality)
+
+3. Tech Stack Rekomendasi
+Frontend (WebBase) + responsiv
+
+React Native
+
+Backend
+
+Node.js + Express / NestJS atau Python FastAPI
+Database: PostgreSQL + Redis (untuk session chat)
+
+AI / Chatbot Engine
+
+Dialogflow CX / Rasa / Botpress / atau custom dengan LangChain + OpenAI GPT-4o / Claude 3 / Grok
+Food recognition: Google Cloud Vision + custom fine-tune atau pakai CalorieMama API / LogMeal API
+
+Database Kalori Makanan Lokal
+
+Gabungan: FatSecret API + Open Food Facts + dataset makanan Indonesia (bikin sendiri atau scrap dari cookpad/halodoc)
+
+Integrasi Eksternal
+
+Google Calendar API + Google Fit
+OAuth2 untuk login Google/Apple
+
+
+4. User Flow Singkat
+
+User buka aplikasi → login dengan Google
+Onboarding 2 menit → target & data dasar
+Langsung masuk chat: “Halo! Selamat pagi Andi, mau sarapan apa hari ini?”
+User ketik atau foto makanan → bot balas kalori + feedback
+Sepanjang hari bot aktif ngingetin minum, olahraga, tidur
+Malam hari bot tanya: “Sudah olahraga belum hari ini?” + kasih prediksi berat minggu depan
+Mingguan bot kirim report + motivasi
+
+5. Contoh Percakapan Chatbot
+User: tadi makan soto ayam 1 mangkok + es teh manis
+Bot: Oke noted!
+Soto ayam (1 mangkok besar) ≈ 450 kcal
+Es teh manis (350ml) ≈ 180 kcal
+Total makan siang: 630 kcal
+Sisa kalori hari ini: 740 kcal
+Malam ini cukup sayur + protein ya, jangan lupa olahraga 30 menit nanti sore! Aku sudah buatkan reminder jam 17.30 di Google Calendar kamu 😉
+6. Monetisasi (opsional nanti)
+
+Freemium: fitur dasar gratis, fitur premium (foto makanan, prediksi detail, resep AI, coach suara) → Rp 49.000/bulan
+Partnership dengan brand makanan sehat / gym

@@ -1,0 +1,135 @@
+Panduan Migrasi DietCoach ke VPS (Ubuntu)
+Panduan ini menjelaskan langkah-langkah untuk memindahkan aplikasi DietCoach ke server VPS dengan domain diet.centonk.my.id.
+
+Spesifikasi Target:
+
+Domain: diet.centonk.my.id (Sudah Live)
+OS: Ubuntu
+Database: PostgreSQL (Sudah terinstall)
+1. Persiapan Server (VPS)
+Login ke VPS Anda melalui SSH:
+
+ssh user@ip_address_vps_anda
+Update & Install Dependencies
+Pastikan sistem operasi terupdate dan install Node.js, Nginx, dan PM2.
+
+# Update package list
+sudo apt update && sudo apt upgrade -y
+# Install Node.js (Versi 18 atau 20 LTS recommended)
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
+sudo apt install -y nodejs
+# Install Nginx (Web Server)
+sudo apt install -y nginx
+# Install PM2 (Process Manager untuk menjalankan aplikasi di background)
+sudo npm install -g pm2
+# Install Git (jika belum ada)
+sudo apt install -y git
+2. Setup Database (PostgreSQL)
+Karena PostgreSQL sudah ada, kita perlu membuat database dan user untuk aplikasi.
+
+# Masuk ke prompt PostgreSQL
+sudo -u postgres psql
+# Buat Database
+CREATE DATABASE dietcoach_db;
+# Buat User dan Password (Ganti 'password_aman' dengan password anda)
+CREATE USER dietcoach_user WITH ENCRYPTED PASSWORD 'password_aman';
+# Berikan hak akses
+GRANT ALL PRIVILEGES ON DATABASE dietcoach_db TO dietcoach_user;
+# Keluar dari psql
+\q
+3. Deploy Aplikasi
+Clone Repository
+Anda bisa menggunakan Git untuk mengambil source code. Jika repository private, pastikan sudah setup SSH Key atau gunakan HTTPS dengan token.
+
+# Pindah ke direktori web (opsional, bisa di /var/www atau /home/user)
+cd /var/www
+# Clone aplikasi
+sudo git clone https://github.com/username/diet-coach.git
+# Atau jika upload manual via SCP/SFTP, upload ke folder ini.
+# Masuk ke folder aplikasi
+cd diet-coach
+Install Dependencies & Build
+# Install library
+npm install
+# Setup Environment Variables
+# Copy file .env.example atau buat baru
+nano .env
+Isi file 
+.env
+ dengan konfigurasi production:
+
+# Database URL (Sesuaikan dengan user/pass yang dibuat tadi)
+DATABASE_URL="postgresql://dietcoach_user:password_aman@localhost:5432/dietcoach_db?schema=public"
+# NextAuth (Generate string acak untuk secret)
+# Bisa generate pakai command: openssl rand -base64 32
+NEXTAUTH_SECRET="string_acak_sangat_panjang_dan_aman"
+NEXTAUTH_URL="https://diet.centonk.my.id"
+# Google Auth (Sama seperti di local)
+GOOGLE_CLIENT_ID="your_google_client_id"
+GOOGLE_CLIENT_SECRET="your_google_client_secret"
+GOOGLE_REDIRECT_URI="https://diet.centonk.my.id/api/auth/google/callback"
+# OpenAI (Jika pakai fitur AI)
+OPENAI_API_KEY="sk-..."
+Database Migration
+Jalankan migrasi Prisma untuk membuat tabel di database production.
+
+npx prisma migrate deploy
+Build Aplikasi
+npm run build
+4. Menjalankan Aplikasi dengan PM2
+PM2 akan menjaga aplikasi tetap berjalan di background.
+
+# Jalankan aplikasi (default port 3000)
+pm2 start npm --name "diet-coach" -- start
+# Simpan list proses agar auto-start saat restart server
+pm2 save
+pm2 startup
+# (Copy paste command yang muncul dari output 'pm2 startup' jika diminta)
+5. Konfigurasi Nginx (Reverse Proxy)
+Nginx akan meneruskan traffic dari domain diet.centonk.my.id ke aplikasi Next.js yang berjalan di port 3000.
+
+Buat file konfigurasi baru:
+
+sudo nano /etc/nginx/sites-available/diet.centonk.my.id
+Isi konfigurasi berikut:
+
+server {
+    server_name diet.centonk.my.id;
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+Aktifkan konfigurasi:
+
+# Buat symlink
+sudo ln -s /etc/nginx/sites-available/diet.centonk.my.id /etc/nginx/sites-enabled/
+# Cek konfigurasi error
+sudo nginx -t
+# Restart Nginx
+sudo systemctl restart nginx
+6. Setup SSL (HTTPS)
+Gunakan Certbot (Let's Encrypt) agar website aman (HTTPS).
+
+# Install Certbot
+sudo apt install -y certbot python3-certbot-nginx
+# Request sertifikat SSL
+sudo certbot --nginx -d diet.centonk.my.id
+Ikuti instruksi di layar. Pilih opsi redirect HTTP to HTTPS jika ditanya.
+
+Selesai! 🎉
+Aplikasi Anda sekarang seharusnya sudah bisa diakses di https://diet.centonk.my.id.
+
+Perintah Berguna (Maintenance)
+Lihat Log Aplikasi: pm2 logs diet-coach
+Restart Aplikasi: pm2 restart diet-coach
+Update Aplikasi:
+git pull
+npm install (jika ada library baru)
+npx prisma migrate deploy (jika ada perubahan DB)
+npm run build
+pm2 restart diet-coach

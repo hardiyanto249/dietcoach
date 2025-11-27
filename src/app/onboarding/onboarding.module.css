@@ -1,0 +1,136 @@
+.container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    position: relative;
+}
+
+.card {
+    width: 100%;
+    max-width: 500px;
+    padding: 2.5rem;
+    position: relative;
+    z-index: 10;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.title {
+    font-size: 1.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.stepIndicator {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+}
+
+.stepDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transition: all 0.3s;
+}
+
+.stepDotActive {
+    background: var(--primary);
+    transform: scale(1.2);
+    box-shadow: 0 0 10px var(--primary-glow);
+}
+
+.formGroup {
+    margin-bottom: 1.5rem;
+}
+
+.label {
+    display: block;
+    margin-bottom: 0.75rem;
+    color: #cbd5e1;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.radioGroup {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.radioLabel {
+    cursor: pointer;
+}
+
+.radioInput {
+    display: none;
+}
+
+.radioCard {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--card-border);
+    padding: 1rem;
+    border-radius: 12px;
+    text-align: center;
+    transition: all 0.3s;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+}
+
+.radioInput:checked+.radioCard {
+    border-color: var(--primary);
+    background: rgba(16, 185, 129, 0.1);
+    box-shadow: 0 0 15px var(--primary-glow);
+    color: var(--primary);
+}
+
+.buttonGroup {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2.5rem;
+    gap: 1rem;
+}
+
+.backButton {
+    background: transparent;
+    border: 1px solid var(--card-border);
+    color: #94a3b8;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.backButton:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+}
+
+.resultContainer {
+    text-align: center;
+}
+
+.resultValue {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--primary);
+    margin: 1rem 0;
+    text-shadow: 0 0 20px var(--primary-glow);
+}
+
+.resultLabel {
+    color: #94a3b8;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}

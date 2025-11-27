@@ -39,3 +39,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/src/generated/prisma
+
+# File konfigurasi yang berisi secret
+pre-dietcoach.txt
+
+# File variabel lingkungan
+.env
+.env.local
